@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Terrav | Control Agrícola Offline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:linear-gradient(135deg,#f5f7f0 0%,#e2ecd9 100%); color:#1e2f1c; line-height:1.5; }
+        .container { max-width:1400px; margin:0 auto; padding:2rem; }
+        .header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2.5rem; border-bottom:2px solid rgba(46,125,50,0.3); padding-bottom:1rem; }
+        .logo-area { display:flex; align-items:center; gap:1rem; }
+        .logo-icon { background:#2e7d32; width:52px; height:52px; border-radius:60% 40% 70% 30%/40% 55% 45% 60%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.1); transform:rotate(-5deg); }
+        .logo-icon i { font-size:32px; color:#ffd966; transform:rotate(5deg); }
+        .logo-text h1 { font-size:1.8rem; font-weight:800; color:#1b5e20; letter-spacing:-0.5px; }
+        .logo-text p { font-size:0.85rem; font-weight:600; color:#4b6e3b; letter-spacing:1px; }
+        .btn-register { background:#ff9800; color:white; border:none; padding:0.8rem 1.8rem; border-radius:60px; font-weight:600; font-size:1rem; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+        .btn-register:hover { background:#f57c00; transform:translateY(-2px); }
+        .top-row { display:flex; flex-wrap:wrap; gap:2rem; margin-bottom:3rem; align-items:center; justify-content:space-between; }
+        .descripcion { flex:1; min-width:260px; }
+        .descripcion h2 { font-size:2.2rem; font-weight:800; color:#1b5e20; margin-bottom:1rem; }
+        .descripcion p { font-size:1rem; color:#2c3e2b; margin-bottom:1.5rem; }
+        .features { display:flex; flex-wrap:wrap; gap:0.8rem; margin-bottom:1.5rem; }
+        .feature-item { display:flex; align-items:center; gap:8px; background:rgba(255,255,240,0.7); backdrop-filter:blur(2px); padding:0.4rem 1rem; border-radius:60px; font-size:0.85rem; font-weight:500; }
+        .premium-section { background:#fef2e0; border-left:4px solid #ff9800; padding:1rem; border-radius:20px; margin:1rem 0; }
+        .btn-test { background:#2e7d32; color:white; border:none; padding:0.8rem 1.8rem; border-radius:60px; font-size:1.1rem; font-weight:bold; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); }
+        .btn-test:hover { background:#1b5e20; transform:scale(1.02); }
+        .carousel-container { width:300px; position:relative; }
+        .carousel { width:300px; height:300px; border-radius:28px; overflow:hidden; box-shadow:0 20px 35px rgba(0,0,0,0.2); background:#ddd; }
+        .carousel-inner { display:flex; transition:transform 0.5s ease; height:100%; }
+        .carousel-slide { min-width:300px; height:300px; object-fit:cover; display:block; }
+        .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; color:white; font-size:1.5rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:10; }
+        .carousel-btn:hover { background:rgba(0,0,0,0.8); }
+        .btn-prev { left:10px; }
+        .btn-next { right:10px; }
+        .dots { text-align:center; margin-top:12px; }
+        .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:#bbb; margin:0 5px; cursor:pointer; }
+        .dot.active { background:#2e7d32; width:12px; height:12px; }
+        .triple-grid { display:grid; grid-template-columns:repeat(3,350px); justify-content:center; gap:2rem; margin-bottom:3rem; }
+        .card { width:350px; height:350px; background:#ffffffd9; border-radius:28px; box-shadow:0 15px 30px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; backdrop-filter:blur(2px); padding:1.5rem; }
+        .leader-card { background:linear-gradient(145deg,#fff9e8,#fff0d4); border:1px solid #ffd966; }
+        .card i { font-size:3rem; margin-bottom:1rem; }
+        .leader-card i { font-size:4rem; color:#ffb300; }
+        .card h3 { font-size:1.5rem; margin-bottom:1rem; }
+        .leader-card h3 { font-size:1.8rem; color:#2e7d32; }
+        .card p { font-size:0.9rem; color:#4e5e3e; }
+        .contact-info p { margin:0.5rem 0; }
+        .learn-grid { display:grid; grid-template-columns:1fr auto; gap:2rem; margin-top:2rem; padding-top:2rem; border-top:2px solid rgba(46,125,50,0.2); }
+        .learn-box { background:white; border-radius:32px; padding:1.8rem; box-shadow:0 10px 25px rgba(0,0,0,0.05); }
+        .learn-box h3 { font-size:1.8rem; color:#1b5e20; margin-bottom:1rem; }
+        .learn-buttons { display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.5rem; }
+        .btn-learn { background:#f0f4e8; border:none; padding:0.8rem 1.5rem; border-radius:50px; font-weight:600; display:inline-flex; align-items:center; gap:10px; cursor:pointer; transition:0.2s; color:#2e7d32; }
+        .btn-learn:hover { background:#e0e8d0; transform:translateY(-2px); }
+        .available-box { width:400px; height:250px; background:#fef7e0; border-radius:32px; padding:1.5rem; text-align:center; border:1px solid #ffb74d; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+        .available-box i { font-size:3rem; color:#ff9800; margin-bottom:1rem; }
+        .available-box h4 { font-size:1.5rem; color:#bf6f00; }
+        .footer { margin-top:4rem; text-align:center; font-size:0.8rem; color:#5c6e4a; border-top:1px solid rgba(46,125,50,0.2); padding-top:2rem; }
+        @media (max-width:1200px) { .triple-grid { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); justify-items:center; } .card { width:100%; max-width:350px; } }
+        @media (max-width:900px) { .learn-grid { grid-template-columns:1fr; justify-items:center; } .available-box { width:100%; max-width:400px; } .top-row { flex-direction:column; align-items:center; } }
+        @media (max-width:640px) { .container { padding:1rem; } .descripcion h2 { font-size:1.8rem; } .carousel-container,.carousel { width:280px; height:280px; } .carousel-slide { min-width:280px; height:280px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+            <div class="logo-text"><h1>TERRAV</h1><p>control agrícola de precisión</p></div>
+        </div>
+        <button class="btn-register" onclick="window.location.href='registro.html'"><i class="fas fa-user-plus"></i> Registrarse</button>
+    </div>
+    <div class="top-row">
+        <div class="descripcion">
+            <h2>Gestiones agrícolas de cultivos.</h2>
+            <p>TerraV es una herramienta para el conteo de la supervivencia de las plantas, en huertos, campos o para uso doméstico, ofrecemos servicios gratuitos para la comunidad y también acceso premium.</p>
+            <div class="features">
+                <div class="feature-item"><i class="fas fa-check-circle"></i> conteo de plantas (selección, vivas muertas o inexistentes)</div>
+                <div class="feature-item"><i class="fas fa-file-export"></i> exportación del trabajo ya realizado a pdf, Excel o png</div>
+                <div class="feature-item"><i class="fas fa-save"></i> autoguardado automático offline</div>
+            </div>
+            <div class="premium-section">
+                <strong>===== versión premium ===</strong><br>
+                - versión premium almacena en la nube (no disponible aún)<br>
+                - beta de la app 100% gratis hasta aplicar nuevas funciones premium
+            </div>
+            <button class="btn-test" onclick="window.location.href='terrav.html'"><i class="fas fa-rocket"></i> Probar herramienta</button>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel">
+                <div class="carousel-inner" id="carouselInner">
+                    <img class="carousel-slide" src="https://picsum.photos/id/104/300/300" alt="Campo agrícola">
+                    <img class="carousel-slide" src="https://picsum.photos/id/162/300/300" alt="Cerezas">
+                    <img class="carousel-slide" src="https://picsum.photos/id/126/300/300" alt="Viña">
+                </div>
+            </div>
+            <button class="carousel-btn btn-prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="carousel-btn btn-next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+            <div class="dots" id="dots"></div>
+        </div>
+    </div>
+    <div class="triple-grid">
+        <div class="card"><i class="fas fa-seedling" style="color:#8bc34a;"></i><h3>AgroTech Solutions</h3><p>Insumos orgánicos y tecnología de riego.<br>¡Cotiza ahora!</p></div>
+        <div class="card leader-card"><i class="fas fa-tractor"></i><h3>Líder en agricultura digital</h3><p>Más de 500 cuadros monitoreados<br>Confiado por agricultores de la región<br>📊 +98% de precisión</p></div>
+        <div class="card contact-info"><i class="fas fa-address-card" style="color:#ff9800;"></i><h3>Contacto</h3><p>📱 +56 9 1234 5678<br>✉️ contacto@terrav.cl<br>📍 Los Nogales 123, Curicó</p></div>
+    </div>
+    <div class="learn-grid">
+        <div class="learn-box"><h3><i class="fas fa-graduation-cap"></i> Aprende a usar Terrav</h3><p>Accede a tutoriales interactivos, manuales descargables y videos explicativos para sacar el máximo provecho de la herramienta.</p><div class="learn-buttons"><button class="btn-learn" onclick="alert('Próximamente: video tutorial')"><i class="fab fa-youtube"></i> Ver tutorial</button><button class="btn-learn" onclick="alert('Descarga el manual en PDF (próximamente)')"><i class="fas fa-download"></i> Manual PDF</button><button class="btn-learn" onclick="alert('Contacta con soporte: soporte@terrav.cl')"><i class="fas fa-headset"></i> Soporte</button><button class="btn-learn" onclick="alert('Foro de usuarios próximamente')"><i class="fas fa-comments"></i> Comunidad</button></div></div>
+        <div class="available-box"><i class="fas fa-box-open"></i><h4>Espacio disponible</h4><p>400x250 px<br>Promociona tu negocio agrícola aquí.<br><strong>Contacta a ventas@terrav.cl</strong></p></div>
+    </div>
+    <div class="footer"><p>© 2025 Terrav · Sistema offline para agricultura de precisión · Monitoreo de cuadros, cerezas, uvas y nueces</p></div>
+</div>
+<script>
+    const carouselInner = document.getElementById('carouselInner');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dots');
+    let currentIndex = 0, autoInterval;
+    function updateCarousel(){ const w=slides[0].clientWidth; carouselInner.style.transform=`translateX(-${currentIndex*w}px)`; updateDots(); }
+    function updateDots(){ document.querySelectorAll('.dot').forEach((d,i)=>{ if(i===currentIndex) d.classList.add('active'); else d.classList.remove('active'); }); }
+    function nextSlide(){ currentIndex=(currentIndex+1)%slides.length; updateCarousel(); resetAutoInterval(); }
+    function prevSlide(){ currentIndex=(currentIndex-1+slides.length)%slides.length; updateCarousel(); resetAutoInterval(); }
+    function resetAutoInterval(){ if(autoInterval) clearInterval(autoInterval); autoInterval=setInterval(nextSlide,3000); }
+    function createDots(){ dotsContainer.innerHTML=''; slides.forEach((_,i)=>{ const d=document.createElement('div'); d.classList.add('dot'); if(i===currentIndex) d.classList.add('active'); d.addEventListener('click',()=>{ currentIndex=i; updateCarousel(); resetAutoInterval(); }); dotsContainer.appendChild(d); }); }
+    window.addEventListener('resize',updateCarousel);
+    createDots(); updateCarousel(); resetAutoInterval();
+    prevBtn.addEventListener('click',prevSlide);
+    nextBtn.addEventListener('click',nextSlide);
+    const carouselContainer=document.querySelector('.carousel-container');
+    carouselContainer.addEventListener('mouseenter',()=>{ if(autoInterval) clearInterval(autoInterval); });
+    carouselContainer.addEventListener('mouseleave',resetAutoInterval);
+</script>
+</body>
+</html>

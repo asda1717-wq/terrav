@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Terrav</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background: linear-gradient(145deg, #1b5e20, #4caf50); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; max-width: 480px; width: 100%; padding: 30px; border-radius: 36px; box-shadow: 0 20px 35px rgba(0,0,0,0.2); text-align: center; }
+        h1 { color: #2e7d32; margin-bottom: 20px; }
+        input { width:100%; padding:14px; margin-bottom:15px; border:none; border-radius:60px; background:#f0f0f0; font-size:16px; padding-left:20px; }
+        button { width:100%; padding:14px; border:none; border-radius:60px; background:#2e7d32; color:white; font-size:18px; font-weight:bold; cursor:pointer; margin-bottom:12px; }
+        .back-btn { background:#ff9800; }
+        .mensaje { margin-top:15px; font-size:14px; color:#666; }
+        .logo-real { display:inline-flex; align-items:center; gap:10px; margin-bottom:20px; }
+        .leaf-icon { width:40px; height:40px; background:#2e7d32; border-radius:80% 0 60% 40%; transform:rotate(-20deg); position:relative; box-shadow:inset -3px -2px 0 #1b5e20; }
+        .leaf-icon::before { content:""; position:absolute; width:8px; height:8px; background:#a5d6a7; border-radius:50%; bottom:5px; left:6px; }
+        .leaf-icon::after { content:""; position:absolute; width:4px; height:16px; background:#5d4037; left:18px; top:28px; border-radius:2px; }
+        .logo-text { font-size:28px; font-weight:bold; color:#ffd966; text-shadow:2px 2px 0 #3e2723; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo-real" style="justify-content:center;"><div class="leaf-icon"></div><span class="logo-text">TERRAV</span></div>
+    <h1>📝 Solicitar Registro</h1>
+    <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="off">
+    <input type="text" id="rut" placeholder="RUT (Ej: 12.345.678-9)" autocomplete="off">
+    <input type="password" id="password" placeholder="Contraseña">
+    <input type="email" id="email" placeholder="Correo electrónico">
+    <button onclick="solicitarRegistro()">Enviar solicitud</button>
+    <button class="back-btn" onclick="window.location.href='terrav.html'">⬅ Volver al login</button>
+    <div id="mensaje" class="mensaje"></div>
+</div>
+<script>
+    function validarRUT(rut) { return /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/.test(rut); }
+    function normalizarRUT(rut) { return rut.replace(/\./g,'').replace(/-/g,'').toLowerCase(); }
+    function solicitarRegistro() {
+        let nombre = document.getElementById("nombre").value.trim();
+        let rut = document.getElementById("rut").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let email = document.getElementById("email").value.trim();
+        if(!nombre || !rut || !password || !email) { alert("Completa todos los campos"); return; }
+        if(!validarRUT(rut)) { alert("RUT inválido. Use formato 12.345.678-9"); return; }
+        let rutNorm = normalizarRUT(rut);
+        let usuarios = JSON.parse(localStorage.getItem("terrav_usuarios") || "[]");
+        if(usuarios.find(u => normalizarRUT(u.usuario) === rutNorm)) { document.getElementById("mensaje").innerHTML = "❌ El RUT ya está registrado."; return; }
+        let solicitudes = JSON.parse(localStorage.getItem("terrav_solicitudes") || "[]");
+        if(solicitudes.find(s => normalizarRUT(s.usuario) === rutNorm)) { document.getElementById("mensaje").innerHTML = "⚠️ Ya hay una solicitud pendiente."; return; }
+        solicitudes.push({ nombre, usuario:rut, password, email, fecha:new Date().toLocaleString(), estado:"pendiente" });
+        localStorage.setItem("terrav_solicitudes", JSON.stringify(solicitudes));
+        document.getElementById("mensaje").innerHTML = "✅ Solicitud enviada. Espera aprobación del administrador o supervisor.";
+        document.getElementById("nombre").value = ""; document.getElementById("rut").value = ""; document.getElementById("password").value = ""; document.getElementById("email").value = "";
+    }
+</script>
+</body>
+</html>
