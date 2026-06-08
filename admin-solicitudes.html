@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Terrav | Solicitudes</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:#eef4e6; padding:30px; }
+        .container { max-width:1400px; margin:0 auto; background:white; border-radius:32px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.1); }
+        h1, h2 { color:#2e7d32; margin-bottom:20px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:30px; }
+        th, td { border:1px solid #ccc; padding:12px; text-align:left; }
+        th { background:#2e7d32; color:white; }
+        button { padding:6px 14px; border:none; border-radius:30px; cursor:pointer; margin:0 4px; font-weight:bold; }
+        .btn-aprobar { background:#4caf50; color:white; }
+        .btn-rechazar { background:#f44336; color:white; }
+        .btn-eliminar { background:#ff9800; color:white; }
+        .logout { background:#555; color:white; padding:8px 20px; border-radius:40px; border:none; cursor:pointer; }
+        .btn-volver { background:#2e7d32; color:white; padding:8px 20px; border-radius:40px; text-decoration:none; display:inline-block; margin-right:10px; }
+        .info-admin { margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="info-admin">
+        <h1>👑 Panel de Administración y Supervisión</h1>
+        <div>
+            <a href="terrav.html" class="btn-volver">⬅ Volver a los cuarteles</a>
+            <button class="logout" onclick="cerrarSesionAdmin()">🚪 Cerrar sesión</button>
+        </div>
+    </div>
+    <div id="mensaje" style="margin-bottom:20px; color:green;"></div>
+    <h2>📋 Solicitudes pendientes</h2>
+    <table id="tablaSolicitudes"><thead><tr><th>Nombre</th><th>RUT</th><th>Email</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    <h2>✅ Usuarios autorizados</h2>
+    <table id="tablaUsuarios"><thead><tr><th>RUT</th><th>Rol</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    <a href="terrav.html" class="btn-volver" style="margin-top:20px;">⬅ Volver a los cuarteles</a>
+</div>
+<script>
+    function normalizarRUT(r){ return r.replace(/\./g,'').replace(/-/g,'').toLowerCase(); }
+    function cargarDatos(){
+        let solicitudes=JSON.parse(localStorage.getItem("terrav_solicitudes")||"[]");
+        let tbody=document.querySelector("#tablaSolicitudes tbody"); tbody.innerHTML="";
+        solicitudes.forEach((s,idx)=>{ let row=tbody.insertRow(); row.insertCell(0).innerText=s.nombre; row.insertCell(1).innerText=s.usuario; row.insertCell(2).innerText=s.email; row.insertCell(3).innerText=s.fecha; let acc=row.insertCell(4); let btnApr=document.createElement("button"); btnApr.innerText="Aprobar"; btnApr.className="btn-aprobar"; btnApr.onclick=()=>aprobarSolicitud(idx); let btnRech=document.createElement("button"); btnRech.innerText="Rechazar"; btnRech.className="btn-rechazar"; btnRech.onclick=()=>rechazarSolicitud(idx); acc.appendChild(btnApr); acc.appendChild(btnRech); });
+        let usuarios=JSON.parse(localStorage.getItem("terrav_usuarios")||"[]");
+        let tbodyU=document.querySelector("#tablaUsuarios tbody"); tbodyU.innerHTML="";
+        usuarios.forEach((u,idx)=>{ if(u.usuario==="admin") return; let row=tbodyU.insertRow(); row.insertCell(0).innerText=u.usuario; row.insertCell(1).innerText=u.rol||"usuario"; let btnDel=document.createElement("button"); btnDel.innerText="Eliminar"; btnDel.className="btn-eliminar"; btnDel.onclick=()=>eliminarUsuario(u.usuario); let cel=row.insertCell(2); cel.appendChild(btnDel); });
+    }
+    function aprobarSolicitud(idx){ let solicitudes=JSON.parse(localStorage.getItem("terrav_solicitudes")||"[]"); let s=solicitudes[idx]; let usuarios=JSON.parse(localStorage.getItem("terrav_usuarios")||"[]"); if(usuarios.find(u=>normalizarRUT(u.usuario)===normalizarRUT(s.usuario))){ document.getElementById("mensaje").innerText="⚠️ El RUT ya existe."; return; } usuarios.push({usuario:s.usuario,password:s.password,rol:"usuario",nombre:s.nombre,email:s.email}); localStorage.setItem("terrav_usuarios",JSON.stringify(usuarios)); solicitudes.splice(idx,1); localStorage.setItem("terrav_solicitudes",JSON.stringify(solicitudes)); document.getElementById("mensaje").innerText="✅ Usuario aprobado como USUARIO básico."; cargarDatos(); }
+    function rechazarSolicitud(idx){ let solicitudes=JSON.parse(localStorage.getItem("terrav_solicitudes")||"[]"); solicitudes.splice(idx,1); localStorage.setItem("terrav_solicitudes",JSON.stringify(solicitudes)); document.getElementById("mensaje").innerText="❌ Solicitud rechazada."; cargarDatos(); }
+    function eliminarUsuario(usuario){ let usuarios=JSON.parse(localStorage.getItem("terrav_usuarios")||"[]"); let nueva=usuarios.filter(u=>u.usuario!==usuario); localStorage.setItem("terrav_usuarios",JSON.stringify(nueva)); document.getElementById("mensaje").innerText=`Usuario ${usuario} eliminado.`; cargarDatos(); }
+    function cerrarSesionAdmin(){ localStorage.removeItem("terrav_sesion"); localStorage.removeItem("recordarUsuario"); localStorage.removeItem("recordarPass"); window.location.href="terrav.html"; }
+    function verificarPermiso(){ let sesion=JSON.parse(localStorage.getItem("terrav_sesion")||"{}"); let usuario=sesion.usuario; if(!usuario){ window.location.href="terrav.html"; return false; } let usuarios=JSON.parse(localStorage.getItem("terrav_usuarios")||"[]"); let user=usuarios.find(u=>u.usuario===usuario); if(!user||(user.rol!=="admin"&&user.rol!=="supervisor")){ alert("No tienes permisos."); window.location.href="terrav.html"; return false; } return true; }
+    if(verificarPermiso()) cargarDatos();
+</script>
+</body>
+</html>
