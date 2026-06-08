@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Terrav | Gestión de Roles</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:#eef4e6; padding:30px; }
+        .container { max-width:1200px; margin:0 auto; background:white; border-radius:32px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.1); }
+        h1 { color:#2e7d32; margin-bottom:20px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:30px; }
+        th, td { border:1px solid #ccc; padding:12px; text-align:left; }
+        th { background:#2e7d32; color:white; }
+        select, button { padding:6px 12px; border-radius:30px; border:1px solid #ccc; cursor:pointer; }
+        .btn-guardar { background:#4caf50; color:white; border:none; }
+        .btn-eliminar { background:#f44336; color:white; border:none; }
+        .btn-volver { background:#2e7d32; color:white; padding:8px 20px; border-radius:40px; text-decoration:none; display:inline-block; margin-right:10px; }
+        .logout { background:#555; color:white; padding:8px 20px; border-radius:40px; border:none; cursor:pointer; }
+        .info-admin { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; gap:15px; }
+        .mensaje { margin-bottom:20px; padding:10px; border-radius:20px; background:#d4edda; color:#155724; display:none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="info-admin">
+        <h1>👑 Gestión de Roles y Usuarios</h1>
+        <div>
+            <a href="terrav.html" class="btn-volver">⬅ Volver a los cuarteles</a>
+            <button class="logout" onclick="cerrarSesionAdmin()">🚪 Cerrar sesión</button>
+        </div>
+    </div>
+    <div id="mensaje" class="mensaje"></div>
+    <table id="tablaUsuarios"><thead><tr><th>RUT</th><th>Nombre</th><th>Rol actual</th><th>Nuevo rol</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+</div>
+<script>
+    let usuariosGlobal = [], usuarioActualSesion = "";
+    function cargarUsuarios(){ let stored=localStorage.getItem("terrav_usuarios"); if(stored) usuariosGlobal=JSON.parse(stored); else usuariosGlobal=[{usuario:"admin",password:"adm",rol:"admin",nombre:"Administrador"}]; let sesion=JSON.parse(localStorage.getItem("terrav_sesion")||"{}"); usuarioActualSesion=sesion.usuario||""; renderTabla(); }
+    function renderTabla(){ let tbody=document.querySelector("#tablaUsuarios tbody"); tbody.innerHTML=""; for(let u of usuariosGlobal){ let row=tbody.insertRow(); row.insertCell(0).innerText=u.usuario; row.insertCell(1).innerText=u.nombre||(u.usuario==="admin"?"Administrador":"---"); row.insertCell(2).innerText=u.rol||"usuario"; let select=document.createElement("select"); ["usuario","supervisor","admin"].forEach(rol=>{ let opt=document.createElement("option"); opt.value=rol; opt.innerText=rol.charAt(0).toUpperCase()+rol.slice(1); if((u.rol||"usuario")===rol) opt.selected=true; select.appendChild(opt); }); if(u.usuario===usuarioActualSesion) select.disabled=true; let celRol=row.insertCell(3); celRol.appendChild(select); let celAcc=row.insertCell(4); let btnGuardar=document.createElement("button"); btnGuardar.innerText="Guardar rol"; btnGuardar.className="btn-guardar"; btnGuardar.onclick=()=>cambiarRol(u.usuario,select.value); let btnEliminar=document.createElement("button"); btnEliminar.innerText="Eliminar"; btnEliminar.className="btn-eliminar"; btnEliminar.onclick=()=>eliminarUsuario(u.usuario); if(u.usuario==="admin" || u.usuario===usuarioActualSesion){ btnEliminar.disabled=true; btnEliminar.style.opacity="0.5"; } celAcc.appendChild(btnGuardar); celAcc.appendChild(btnEliminar); } }
+    function cambiarRol(usuario,nuevoRol){ let user=usuariosGlobal.find(u=>u.usuario===usuario); if(!user) return; if(usuario==="admin" && nuevoRol!=="admin"){ mostrarMensaje("No se puede cambiar el rol del administrador principal.","error"); return; } if(usuario===usuarioActualSesion && nuevoRol!==user.rol){ mostrarMensaje("No puedes cambiar tu propio rol.","error"); return; } user.rol=nuevoRol; localStorage.setItem("terrav_usuarios",JSON.stringify(usuariosGlobal)); mostrarMensaje(`Rol de ${usuario} actualizado a ${nuevoRol}.`,"success"); renderTabla(); }
+    function eliminarUsuario(usuario){ if(usuario==="admin"){ mostrarMensaje("No se puede eliminar al administrador principal.","error"); return; } if(usuario===usuarioActualSesion){ mostrarMensaje("No puedes eliminarte a ti mismo.","error"); return; } if(confirm(`¿Eliminar permanentemente a ${usuario}?`)){ usuariosGlobal=usuariosGlobal.filter(u=>u.usuario!==usuario); localStorage.setItem("terrav_usuarios",JSON.stringify(usuariosGlobal)); mostrarMensaje(`Usuario ${usuario} eliminado.`,"success"); renderTabla(); } }
+    function mostrarMensaje(texto,tipo){ let msg=document.getElementById("mensaje"); msg.innerText=texto; msg.style.display="block"; msg.style.backgroundColor=tipo==="error"?"#f8d7da":"#d4edda"; msg.style.color=tipo==="error"?"#721c24":"#155724"; setTimeout(()=>msg.style.display="none",3000); }
+    function cerrarSesionAdmin(){ localStorage.removeItem("terrav_sesion"); localStorage.removeItem("recordarUsuario"); localStorage.removeItem("recordarPass"); window.location.href="terrav.html"; }
+    function verificarAdmin(){ let sesion=JSON.parse(localStorage.getItem("terrav_sesion")||"{}"); let usuario=sesion.usuario; if(!usuario){ window.location.href="terrav.html"; return false; } let usuarios=JSON.parse(localStorage.getItem("terrav_usuarios")||"[]"); let user=usuarios.find(u=>u.usuario===usuario); if(!user || user.rol!=="admin"){ alert("Solo administradores pueden acceder."); window.location.href="terrav.html"; return false; } return true; }
+    if(verificarAdmin()) cargarUsuarios();
+</script>
+</body>
+</html>
